@@ -1,0 +1,98 @@
+#!/usr/bin/bash
+
+#####################################
+#Loading Settings
+#####################################
+if [[ -f "/etc/updateIP/updateIP.conf" && -r "/etc/updateIP/updateIP.conf" ]] #Check if the settings file exists
+then
+  . /etc/updateIP/updateIP.conf
+else
+  echo "Settings file (/etc/updateIP/updateIP.conf) missing or access is denied."
+  exit
+fi
+myIP="$(dig +short myIP.opendns.com @resolver1.opendns.com)"
+lastIP=`cat $IPfile`
+#####################################
+#####################################
+
+
+#####################################
+#Functions
+#####################################
+listIP(){
+  ####################################
+  #Cloudflare's Update IP API
+  ####################################
+  curl -X GET "https://api.cloudflare.com/client/v4/zones/$zone/dns_records" \
+     -H "X-Auth-Email: $email" \
+     -H "X-Auth-Key: $key" \
+     -H "Content-Type: application/json" | sed "s/{/{\n/g" | sed "s/}/}\n/g" | sed "s/,/,\n/g"
+  ####################################
+  ####################################
+}
+
+updateIP(){
+  if [ "$myIP" != "$lastIP" ]
+  then
+    ####################################
+    #Cloudflare's Update IP API
+    ####################################
+    curl -X PUT "https://api.cloudflare.com/client/v4/zones/$zone/dns_records/$id" \
+       -H "X-Auth-Email: $email" \
+       -H "X-Auth-Key: $key" \
+       -H "Content-Type: application/json" \
+       --data "{\"type\":\"A\",\"name\":\"home\",\"content\":\"$myIP\",\"ttl\":120,\"proxied\":false}"
+    ####################################
+    ####################################
+  fi
+  echo $myIP > $IPfile
+}
+#####################################
+#####################################
+
+#####################################
+#Check for command line options
+#####################################
+while [[ $# -gt 0 ]]
+do
+  args="$1"
+  case $args in
+  -l|--list) #Exit the terminal once you close the script
+    shift # past argument
+    listIP
+    ;;
+  *)
+    echo "Usage: $0 [-l]
+
+-l	List all of the connections for the zone"
+    exit 1
+    ;;
+  esac
+done
+#####################################
+#####################################
+
+#####################################
+#Make sure only one instance ever runs.
+#####################################
+if [ -f "$pidfile" ]
+then
+    if [ $(ps -ef|grep -c $(cat $pidfile)) -gt 1 ]
+    then
+        echo -e "Still running.\n\nPID:" && cat $pidfile
+        exit 1
+    else
+        rm $pidfile
+    fi
+fi
+echo $$ > $pidfile
+#####################################
+#####################################
+
+#####################################
+#Main Program
+#####################################
+updateIP
+rm $pidfile
+#####################################
+#####################################
