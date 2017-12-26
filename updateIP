@@ -1,0 +1,40 @@
+#!/usr/bin/bash
+if [ -f "/etc/updateIP/updateIP.conf" ]
+then
+  . /etc/updateIP/updateIP.conf
+else
+  echo "Permission denied to setting file or Settings file missing..."
+  exit
+fi
+myIP="$(dig +short myIP.opendns.com @resolver1.opendns.com)"
+lastIP=`cat $IPfile`
+
+#Make sure only one instance ever runs.
+if [ -f "$pidfile" ]
+then
+    if [ $(ps -ef|grep -c $(cat $pidfile)) -gt 1 ]
+    then
+        echo -e "Still running.\n\nPID:" && cat $pidfile
+        exit 1
+    else
+        rm $pidfile
+    fi
+fi
+echo $$ > $pidfile
+
+if [ "$myIP" != "$lastIP" ]
+then
+  ####################################
+  #Cloudflare's Update IP API
+  ####################################
+  curl -X PUT "https://api.cloudflare.com/client/v4/zones/$zone/dns_records/$id" \
+     -H "X-Auth-Email: $email" \
+     -H "X-Auth-Key: $key" \
+     -H "Content-Type: application/json" \
+     --data "{\"type\":\"A\",\"name\":\"home\",\"content\":\"$myIP\",\"ttl\":120,\"proxied\":false}"
+  ####################################
+  ####################################
+  ####################################
+fi
+echo $myIP > $IPfile
+rm $pidfile
