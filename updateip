@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 #####################################
 #Loading Settings
@@ -41,7 +41,7 @@ updateIP(){
        -H "X-Auth-Email: $email" \
        -H "X-Auth-Key: $key" \
        -H "Content-Type: application/json" \
-       --data "{\"type\":\"A\",\"name\":\"home\",\"content\":\"$myIP\",\"ttl\":120,\"proxied\":false}"
+       --data "{\"type\":\"A\",\"name\":\"$subdomain\",\"content\":\"$myIP\",\"ttl\":120,\"proxied\":false}"
     ####################################
     ####################################
   fi
