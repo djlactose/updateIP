@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#####################################
+#Loading Settings
+#####################################
+if [[ -f "/etc/updateIP/updateIP.conf" && -r "/etc/updateIP/updateIP.conf" ]] #Check if the settings file exists
+then
+  . /etc/updateIP/updateIP.conf
+else
+  echo "Settings file (/etc/updateIP/updateIP.conf) missing or access is denied."
+  exit
+fi
+
+curl -X GET "https://api.cloudflare.com/client/v4/zones/$zone/dns_records" \
+     -H "X-Auth-Email: $email" \
+     -H "X-Auth-Key: $key" \
+     -H "Content-Type: application/json"|sed s/,/\\n/g|sed s/{//g|sed s/\"//g|grep -E 'name|id'|grep -v _|sed s/result://g
