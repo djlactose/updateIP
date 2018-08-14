@@ -10,4 +10,4 @@ ln -s /bin/updateip /etc/periodic/15min/updateip
 
 VOLUME /etc/updateIP/
 
-ENTRYPOINT top
+ENTRYPOINT ["crond","-f"]
