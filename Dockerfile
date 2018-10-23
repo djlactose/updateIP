@@ -9,7 +9,7 @@ ENV subdomain <subdomain name you want to be updated>
 copy updateip /bin/updateip
 copy zonelist /bin/zonelist
 copy updateIP.conf /etc/updateIP/updateIP.conf
-copy run.sh /run.sh
+copy run.sh /bin/run.sh
 
 RUN apk update && \
 apk add curl bind-tools bash && \
@@ -20,4 +20,4 @@ chmod 700 /etc/updateIP/updateIP.conf
 
 VOLUME /etc/updateIP/
 
-ENTRYPOINT /run.sh
+ENTRYPOINT /bin/run.sh
