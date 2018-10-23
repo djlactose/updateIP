@@ -16,7 +16,8 @@ apk add curl bind-tools bash && \
 ln -s /bin/updateip /etc/periodic/15min/updateip && \
 chmod 700 /bin/updateip && \
 chmod 700 /bin/zonelist && \
-chmod 700 /etc/updateIP/updateIP.conf
+chmod 700 /etc/updateIP/updateIP.conf && \
+chmod 700 /bin/run.sh
 
 VOLUME /etc/updateIP/
 
