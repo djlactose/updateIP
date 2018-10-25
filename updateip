@@ -34,6 +34,7 @@ listIP(){
 updateIP(){
   if [ "$myIP" != "$lastIP" ]
   then
+    echo "IP Update needed"
     ####################################
     #Cloudflare's Update IP API
     ####################################
@@ -44,6 +45,9 @@ updateIP(){
        --data "{\"type\":\"A\",\"name\":\"$subdomain\",\"content\":\"$myIP\",\"ttl\":120,\"proxied\":false}"
     ####################################
     ####################################
+    echo "IP Update made"
+  else
+    echo "IP Update not needed"
   fi
   echo $myIP > $IPfile
 }
@@ -92,7 +96,9 @@ echo $$ > $pidfile
 #####################################
 #Main Program
 #####################################
+echo "Start run at " $(date)
 updateIP
+echo "End run at " $(date)
 rm $pidfile
 #####################################
 #####################################

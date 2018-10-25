@@ -13,12 +13,10 @@ copy run.sh /bin/run.sh
 
 RUN apk update && \
 apk add curl bind-tools bash && \
-echo "* * * * * /bin/updateip" >> /etc/crontabs/root && \
+echo "* * * * * /bin/updateip > /dev/stdout" >> /etc/crontabs/root && \
 chmod 700 /bin/updateip && \
 chmod 700 /bin/zonelist && \
 chmod 700 /etc/updateIP/updateIP.conf && \
 chmod 700 /bin/run.sh
-
-VOLUME /etc/updateIP/
 
 ENTRYPOINT /bin/run.sh
