@@ -19,4 +19,4 @@ chmod 700 /bin/zonelist && \
 chmod 700 /etc/updateIP/updateIP.conf && \
 chmod 700 /bin/run.sh
 
-ENTRYPOINT /bin/run.sh
+CMD /bin/run.sh
